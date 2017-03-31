@@ -1,0 +1,15 @@
+body *{
+	font-family: Arial, "Hiragino Sans GB", 微软雅黑, 黑体-简, Helvetica, sans-serif;
+	font-size: 14px;
+}
+.content-header>h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.select2-dropdown.increasedzindexclass {
+  z-index: 999999;
+}
+.error{
+	color: red;
+}

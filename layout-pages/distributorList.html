@@ -1,0 +1,110 @@
+<section class="content-header">
+  <h1>
+    经销商列表
+    <small>带分页组件</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li><a href="#">Tables</a></li>
+    <li class="active">Data tables</li>
+  </ol>
+</section>
+<div class="content">
+    <link rel="stylesheet" href="plugins/datatables/dataTables.bootstrap.css">
+
+    <div id="grid_1"></div>
+    <div id="grid_1_pg"></div>
+    <hr>
+    <div id="grid_2"></div>
+    <div id="grid_2_pg"></div>
+
+    <script src="plugins/pagination/jquery.pagination.js"></script>
+    <script src="plugins/grid/jquery.grid.js"></script>
+    <script type="text/javascript">
+
+        $('#grid_1').grid({
+
+            pagination: {
+                "pageSize": 10,
+                "currentPage": 1,
+                "textPrev": "上一页",
+                "textNext": "下一页",
+                "textStatus": "当前显示第 ${limit1} 至 ${limit2} 条，共 ${total} 条数据。",
+                "onPageChange": function(page) {}
+            },
+            idField: 'id',
+            dataUrl: '/distributor/queryDistributorPage?pageSize=$pageSize&currentPage=$pageIndex&sortFeild=$sortFeild&sortType=$sortType',
+            deleteUrl: '/mock/grid.json?action=detele&id=$id',
+            updateUrl: '/mock/grid.json?action=update&id=$id',
+            addUrl: '/mock/grid.json?action=add&id=$id',
+            highlight: true,
+            zebra: true,
+            checkbox: true,
+            multiSelect: false,
+            onSelected: function() {},
+            columns: [
+                 {
+                    id:'name',
+                    title:'名称',
+                    sortable:true,
+                    width:240,
+                    align:'left',
+                    formatter:function(value, data){ 
+                        return '<a target="_brank" href="/distributor/queryDistributor?id='+data.id+'">'+value+'</a>' ;
+                         }
+                }, {
+                    id:'address',
+                    title:'地址',
+                    sortable:false,
+                    width:80,
+                    align:'left',
+                    formatter:function(value, data){
+                        return value;
+                    }
+                }, {
+                    id:'industry',
+                    title:'行业',
+                    sortable:true,
+                    width:100,
+                    align:'left',
+                    formatter:function(value, data){
+                        return value;
+                    }
+                }, {
+                    id:'website',
+                    title:'网址',
+                    sortable:true,
+                    width:100,
+                    align:'left',
+                    formatter:function(value, data){
+                       return value;
+                    }
+                }, {
+                    id:'level',
+                    title:'级别',
+                    sortable:true,
+                    width:100,
+                    align:'left',
+                    formatter:function(value, data){
+                    
+                        return value
+                    }
+                }, {
+                    id:'createdTime',
+                    title:'创建时间',
+                    sortable:true,
+                    width:100,
+                    align:'left',
+                    formatter:function(value, data){
+                    
+                        return moment(value).format('YYYY-MM-DD')
+                    }
+                }
+            ],
+            data: {}
+        });
+
+        
+    </script>
+
+</div>

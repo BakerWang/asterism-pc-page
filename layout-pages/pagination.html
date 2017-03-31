@@ -1,0 +1,404 @@
+<section class="content-header">
+  <h1>
+    数据表格
+    <small>带分页组件</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li><a href="#">Tables</a></li>
+    <li class="active">Data tables</li>
+  </ol>
+</section>
+<div class="content">
+    <link rel="stylesheet" href="plugins/datatables/dataTables.bootstrap.css">
+    <link rel="stylesheet" href="plugins/dialog/dialog.css">
+
+    <link rel="stylesheet" href="plugins/uploadify/uploadify.css">
+
+    <script src="plugins/pagination/jquery.pagination.js"></script>
+    <script src="plugins/uploadify/jquery.uploadify.js"></script>
+    <script src="plugins/dialog/dialog.js"></script>
+    <script src="plugins/grid/jquery.grid.js"></script>
+    <script src="plugins/ajaxfileupload/ajaxfileupload.js"></script>
+
+
+    <div id="grid_1_filter">
+        <form class="form-inline">
+          <div class="form-group">
+            <label class="sr-only" for="exampleInputEmail3">Email address</label>
+            <input type="email" class="form-control" name="email" id="exampleInputEmail3" placeholder="Email">
+          </div>
+          <div class="form-group">
+            <label class="sr-only" for="exampleInputPassword3">Age</label>
+            <input type="number" class="form-control" name="age" id="exampleInputPassword3" placeholder="年龄">
+          </div>
+          <div class="form-group">
+            <label class="sr-only" for="exampleInputPassword3">xxxx</label>
+            <input type="date" class="form-control" name="age" id="exampleInputPassword3" placeholder="">
+          </div>
+        </form>
+    </div>
+    <div id="grid_1"></div>
+
+
+
+
+
+
+
+
+    <div id="grid_1_pg"></div>
+    <hr>
+    <div id="grid_2_pg"></div>
+
+
+    <script type="text/javascript">
+
+
+        $('#grid_1').grid({
+
+            pagination: {
+                "pageSize": 10,
+                "currentPage": 1,
+                "textPrev": "上一页xxx",
+                "textNext": "下一页",
+                "textStatus": "当前显示第 ${limit1} 至 ${limit2} 条，共 ${total} 条数据。",
+                "onPageChange": function(page) {}
+            },
+            idField: 'taskId',
+            dataUrl: '/mock/grid.json?pageSize=$pageSize&pageIndex=$pageIndex&sortFeild=$sortFeild&sortType=$sortType',
+            multiDeleteUrl: '/mock/grid.json?action=multiDetele&ids=$ids',
+            addPageUrl: 'layout-pages/add-page.html',
+            addUrl: '/mock/grid.json?action=add&id=$id',
+            addDialogTitle: '新增xx', // 新增弹框的标题
+            filter: $('#grid_1_filter'),
+            hover: true,
+            zebra: true,
+            checkbox: true,
+            multiSelect: false,
+            onSelected: function() {},
+            queryParams: function() {
+
+                var pageParams = pageLoader.getParams();
+
+                return {
+                    categoryId: pageParams.categoryId || 0,
+                    timestamp: new Date().getTime()
+                }
+            },
+            tools: [
+                {
+                    icon: 'fa-plus',
+                    title: '新增xx',
+                    style: 'primary', // default, primary, success, info, warning, danger, link
+                    apartAction: function(button, grid) {
+                        grid.handleAdd(); // 默认的新增弹框
+                    }
+                },
+                {
+                    icon: 'fa-plus',
+                    title: '新增人员',
+                    style: 'default', // default, primary, success, info, warning, danger, link
+                    apartAction: function(button, grid) {
+                        grid.handleAdd(); // 默认的新增弹框
+                    }
+                }, {
+                    icon: 'fa-plus',
+                    title: '添加部门',
+                    style: 'default', // default, primary, success, info, warning, danger, link
+                    apartAction: function(button, grid) {
+
+                        $.get('layout-pages/add-page.html')
+                        .success(function(html) {
+                            Dialog.show({
+                                title: '添加部门',
+                                message: $(html),
+                                submitDataType: 'json', // json, form
+                                submit: function(data, dialog) {
+
+                                    $.post('layout-pages/add-page.html', data)
+                                        .success(function() {
+                                            Dialog.alert({message:'保存成功。', size:'size-small', type:'type-success'});
+                                            grid.reload(); //刷新表格
+                                            dialog.close();
+                                        })
+                                        .error(function() {
+                                            Dialog.alert({message:'提交失败。', size:'size-small', type:'type-danger'});
+                                        });
+                                },
+                                buttons: [{
+                                    label: '取消',
+                                    action: function(dialog) {
+                                        dialog.close();
+                                    }
+                                }, {
+                                    label: '保存',
+                                    cssClass: 'btn-primary',
+                                    action: function(dialog) {
+                                        dialog.submit();
+                                    }
+                                }]
+                            });
+                        });
+                    }
+                }, {
+                    icon: 'fa-pencil',
+                    title: '编辑',
+                    style: 'default', // default, primary, success, info, warning, danger, link
+                    action: function(data, button, grid) {
+                        var url = grid.options.addPageUrl + "?id=" + data.id;
+                        $.get(url)
+                        .success(function(html) {
+
+                            Dialog.show({
+                                title: '编辑'+ data.moduleName,
+                                message: $(html),
+                                submitDataType: 'json', // json, form
+                                submit: function(data, dialog) {
+                                    $.post('layout-pages/add-page.html', data)
+                                        .success(function() {
+                                            Dialog.alert({message:'保存成功。', size:'size-small', type:'type-success'});
+                                            grid.reload(); //刷新表格
+                                            dialog.close();
+                                        })
+                                        .error(function() {
+                                            Dialog.alert({message:'提交失败。', size:'size-small', type:'type-danger'});
+                                        });
+                                },
+                                buttons: [{
+                                    label: '取消',
+                                    action: function(dialog) {
+                                        dialog.close();
+                                    }
+                                }, {
+                                    label: '保存',
+                                    cssClass: 'btn-primary',
+                                    action: function(dialog) {
+                                        dialog.submit();
+                                    }
+                                }]
+                            });
+                        });
+                    }
+                }, {
+                    icon: 'fa-circle',
+                    title: '审批',
+                    style: 'default', // default, primary, success, info, warning, danger, link
+                    forceEnabled: true,
+                    batchAction: function(ids, button, grid) {
+                        console.log(ids);
+
+                        // data
+                        Dialog.show({
+                            title: '批量审批'+ ids.split(',').length + '项',
+                            message: $('<form class="form-inline">\
+                                          <div class="form-group">\
+                                            <label for="exampleInputName2">审批意见：</label>\
+                                            <input type="text" class="form-control" name="exampleInputName" id="exampleInputName2" placeholder="同意">\
+                                          </div>\
+                                        </form>'),
+                            submit: function(data, dialog) {
+
+                                $.post('layout-pages/add-page.html', data)
+                                    .success(function() {
+                                        Dialog.alert({message:'审批成功。', size:'size-small', type:'type-success'});
+                                        grid.reload(); // 刷新表格
+                                        dialog.close();
+                                    })
+                                    .error(function() {
+                                        Dialog.alert({message:'审批失败。', size:'size-small', type:'type-danger'});
+                                    });
+                            },
+                            buttons: [{
+                                label: '取消',
+                                action: function(dialog) {
+                                    dialog.close();
+                                }
+                            }, {
+                                label: '审批',
+                                cssClass: 'btn-primary',
+                                action: function(dialog) {
+                                    dialog.submit();
+                                }
+                            }]
+                        });
+                    },
+                    action: function(data, button, grid) {
+                        // data
+                        Dialog.show({
+                            title: '审批'+ data.moduleName,
+                            message: $('<form class="form-inline">\
+                                          <div class="form-group">\
+                                            <label for="exampleInputName2">审批意见：</label>\
+                                            <input type="text" class="form-control" name="exampleInputName" id="exampleInputName2" placeholder="同意">\
+                                          </div>\
+                                        </form>'),
+                            submit: function(data, dialog) {
+                                $.post('layout-pages/add-page.html', data)
+                                    .success(function() {
+                                        Dialog.alert({message:'审批成功。', size:'size-small', type:'type-success'});
+                                        grid.reload(); // 刷新表格
+                                        dialog.close();
+                                    })
+                                    .error(function() {
+                                        Dialog.alert({message:'审批失败。', size:'size-small', type:'type-danger'});
+                                    });
+                            },
+                            buttons: [{
+                                label: '取消',
+                                action: function(dialog) {
+                                    dialog.close();
+                                }
+                            }, {
+                                label: '审批',
+                                cssClass: 'btn-primary',
+                                action: function(dialog) {
+                                    dialog.submit();
+                                }
+                            }]
+                        });
+                    }
+                }, {
+                    icon: 'fa-circle',
+                    title: '退回重审',
+                    style: 'default', // default, primary, success, info, warning, danger, link
+                    action: function(data, button, grid, isMulti) {
+                        // data
+                        console.log(data);
+                    }
+                }, {
+                    icon: 'fa-remove',
+                    title: '删除',
+                    style: 'danger', // default, primary, success, info, warning, danger, link
+                    batchAction: function(ids, button, grid) {
+                        Dialog.show({
+                            title: '批量删除'+ ids.split(',').length + '项',
+                            message: '是否删除？',
+                            buttons: [
+                                {
+                                    label: '取消',
+                                    action: function(dialog) {
+                                        dialog.close();
+                                    }
+                                }, {
+                                    label: '删除',
+                                    cssClass: 'btn-danger',
+                                    action: function(dialog) {
+                                        $.get('/mock/grid.json?action=delete&ids='+ ids)
+                                            .success(function(){
+                                                Dialog.alert('删除成功！');
+                                                Dialog.alert({message:'删除成功！', size:'size-small', type:'type-success'});
+                                                grid.reload(); // 刷新表格
+                                                dialog.close();
+                                            })
+                                            .error(function() {
+                                                Dialog.alert('删除失败！');
+                                                Dialog.alert({message:'删除成功！', size:'size-small', type:'type-warning'});
+                                            });
+                                    }
+                                }
+                            ]
+                        });
+
+                        console.log(ids);
+                    },
+                    action: function(row, button, grid) {
+                        // data
+                        // '/mock/grid.json?action=delete&id=$id'
+
+                        Dialog.show({
+                            title: '删除'+ row.moduleName,
+                            message: '是否删除？',
+                            buttons: [{
+                                label: '取消',
+                                action: function(dialog) {
+                                    dialog.close();
+                                }
+                            }, {
+                                label: '删除',
+                                cssClass: 'btn-danger',
+                                action: function(dialog) {
+                                    $.get('/mock/grid.json?action=delete&id='+ row.participantName)
+                                        .success(function(){
+                                            Dialog.alert('删除成功！');
+                                            Dialog.alert({message:'删除成功！', size:'size-small', type:'type-success'});
+                                            grid.reload(); //刷新表格
+                                            dialog.close();
+                                        })
+                                        .error(function() {
+                                            Dialog.alert('删除失败！');
+                                            Dialog.alert({message:'删除成功！', size:'size-small', type:'type-warning'});
+                                        });
+                                }
+                            }]
+                        });
+
+                        console.log(row);
+                    }
+                }
+            ],
+            columns: [
+                {
+                    id:'participantName',
+                    title:'姓名',
+                    sortable:true,
+                    width:40,
+                    align:'left',
+                    formatter:function(value, data){
+                        return '<a href="#" grid-action="reload({categoryId:\''+ value +'\'});">'+ value + '('+ Math.random() +')</a>';
+                    }
+                }, {
+                    id:'taskTitle',
+                    title:'任务',
+                    sortable:false,
+                    width:80,
+                    align:'left',
+                    formatter:function(value, data){
+                        return '<a href="/layout-pages/pagination.html?categoryId='+ value +'">'+ value + '('+ Math.random() +')</a>';
+                        // return '<span style="color:red;">'+value+'</span>'
+                    }
+                }, {
+                    id:'moduleName',
+                    title:'模块名称',
+                    sortable:true,
+                    width:100,
+                    align:'left',
+                    // formatter:function(value, data){  }
+                }, {
+                    id:'taskEndTime',
+                    title:'任务结束时间',
+                    sortable:true,
+                    width:100,
+                    align:'left',
+                    // formatter:function(value, data){  }
+                }
+            ]
+        });
+
+        $('#grid_1_pg').pagination({
+            "pageSize": 10,
+            "currentPage": 14,
+            "totalNum": 182,
+            "onPageChange": function(page, oldPage) {
+                $('#grid_1').append('<div>Page has changed from '+ oldPage +' to '+ page + '</div>');
+            },
+            "textPrev": "前一页",
+            "textNext": "后一页",
+            "textStatus": "当前显示第 ${limit1} 至 ${limit2} 条，共 ${total} 条数据。",
+        });
+
+        $('#grid_2_pg').pagination({
+            "pageSize": 10,
+            "currentPage": 14,
+            "totalNum": 182,
+            "onPageChange": function(page, oldPage) {
+                $('#grid_2').append('<div>Page has changed from '+ oldPage +' to '+ page + '</div>');
+            },
+            "textPrev": "上一页",
+            "textNext": "下一页",
+            "textStatus": "当前显示第 ${limit1} 至 ${limit2} 条，共 ${total} 条数据。",
+        });
+
+    </script>
+
+</div>
