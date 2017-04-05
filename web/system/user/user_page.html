@@ -1,15 +1,8 @@
 <section class="content-header">
     <h1>
-        用户中心
+        系统管理
         <small>用户管理</small>
     </h1>
-    <!-- 
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i>Home</a></li>
-        <li><a href="#">Tables</a></li>
-        <li class="active">Data tables</li>
-    </ol>
-    -->
 </section>
 <div class="content">
     <link rel="stylesheet" href="plugins/datatables/dataTables.bootstrap.css">
@@ -159,91 +152,55 @@
                             console.log(ids);
                         }
                     },
-//                    {
-//                        icon: 'fa-pencil',
-//                        title: '查看',
-//                        style: 'default', // default, primary, success, info, warning, danger, link
-//                        action: function (data, button, grid) {
-//                            var url = grid.options.addPageUrl + "?id=" + data.id;
-//                            $.get(url).success(function (html) {
-//                                html = $(html);
-//                                if(data.roleName!=null){
-//                                    html.find('#roleName').html(data.roleName);
-//                                }
-//                                if(data.roleCode!=null){
-//                                    html.find('#roleCode').html(data.roleCode);
-//                                }
-//                                if(data.description!=null){
-//                                    html.find('#description').html(data.description);
-//                                }
-//                                Dialog.show({
-//                                    'message':$(html),
-//                                    buttons: [{
-//                                        label: '取消',
-//                                        action: function(dialog) {
-//                                            dialog.close();
-//                                        }
-//                                    }]
-//                                });
-//                            });
-//                            console.log(data);
-//                        }
-//                    },
                     {
                         icon: 'fa-pencil',
                         title: '更新',
-                        width:100,
-                        style: 'default', // default, primary, success, info, warning, danger, link
                         width: 100,
+                        style: 'default', // default, primary, success, info, warning, danger, link
                         action: function (data, button, grid) {
-                            $.get("web/userCenter/updateRolePage.html").success(function (html) {
+                            $.get("web/system/user/user_page_update.html").success(function (html) {
                                 html = $(html);
-                                if(data.id!=null){
-                                    html.find("#id").val(data.id);
-                                }
-                                if(data.roleName!=null){
-                                    html.find('#roleName').val(data.roleName);
-                                }
-                                if(data.roleCode!=null){
-                                    html.find('#roleCode').val(data.roleCode);
-                                }
-                                if(data.description!=null){
-                                    html.find('#description').val(data.description);
-                                }
+                                html.find('#userName').val(data.userName);
+                                html.find('#sex').val(data.sex);
+                                html.find('#cellPhoneNum').val(data.cellPhoneNum);
+                                html.find('#email').val(data.email);
+                                html.find('#position').val(data.position);
+                                html.find('#loginType').val(data.loginType);
+                                html.find('#id').val(data.id);
                                 Dialog.show({
-                                     'title':"编辑用户",
-                                     'message':$(html),
-                                      submit:function(data, dialog){
-                                          $.post('/userCenter/updateRole', data)
-                                                  .success(function () {
-                                                      Dialog.alert({
-                                                          message: '更新成功。',
-                                                          size: 'size-small',
-                                                          type: 'type-success'
-                                                      });
-                                                      grid.reload(); //刷新表格
-                                                      dialog.close();
-                                                  })
-                                                  .error(function () {
-                                                      Dialog.alert({
-                                                          message: '提交失败。',
-                                                          size: 'size-small',
-                                                          type: 'type-danger'
-                                                      });
-                                                  });
-                                      },
-                                     buttons: [{
-                                         label: '保存',
-                                         cssClass: 'btn-primary',
-                                         action: function (dialog) {
-                                             dialog.submit();
-                                         }
-                                     },{
+                                    'title': "编辑用户信息",
+                                    'message': html,
+                                    submit: function (data, dialog) {
+                                        $.post('/pc/user/update', data)
+                                            .success(function () {
+                                                Dialog.alert({
+                                                    message: '更新成功，密码已被强制重置。',
+                                                    size: 'size-small',
+                                                    type: 'type-success'
+                                                });
+                                                grid.reload(); //刷新表格
+                                                dialog.close();
+                                            })
+                                            .error(function () {
+                                                Dialog.alert({
+                                                    message: '提交失败。',
+                                                    size: 'size-small',
+                                                    type: 'type-danger'
+                                                });
+                                            });
+                                    },
+                                    buttons: [{
+                                        label: '保存',
+                                        cssClass: 'btn-primary',
+                                        action: function (dialog) {
+                                            dialog.submit();
+                                        }
+                                    }, {
                                         label: '取消',
-                                        action: function(dialog) {
+                                        action: function (dialog) {
                                             dialog.close();
                                         }
-                                     }]
+                                    }]
                                 });
                             });
                             console.log(data);

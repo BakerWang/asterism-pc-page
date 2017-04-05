@@ -1,0 +1,82 @@
+<form class="form-horizontal">
+    <div class="form-group">
+        <label class="col-sm-2 control-label">权限名称</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" id="moduleName" name="moduleName">
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">模块编码</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control"  id="moduleCode" name="moduleCode">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">权限编码</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control"  id="permissionCode" name="permissionCode">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">模块地址</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control"  id="permissionUrl" name="permissionUrl">
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">模块图标</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control"  id="permissionICO" name="permissionICO">
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">权限类型</label>
+        <div class="col-sm-8">
+            <select class="form-control select3-1" style="width: 100%" name="permissionType" id="permissionType">
+                <option>--请选择--</option>
+                <option value="0">目录</option>
+                <option value="1">资源</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">父级目录</label>
+        <div class="col-sm-8">
+            <select class="form-control select3-1" style="width: 100%" name="parentId" id="parentId">
+
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">适用类型</label>
+        <div class="col-sm-8">
+            <select class="form-control select3-1" style="width: 100%" name="terminalType" id="terminalType">
+                <option>--请选择--</option>
+                <option value="0">PC端</option>
+                <option value="1">手机端</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<script>
+      $(function(){
+          $.get('/pc/permission/queryNormalCatalogs',
+              function (json) {
+                  console.log(json.data);
+                  $.each(json.data, function (key, value) {
+                      $('#parentId').append("<option value='" + value.id + "'>" + value.moduleName + "</option>");
+                  })
+              });
+      });
+</script>

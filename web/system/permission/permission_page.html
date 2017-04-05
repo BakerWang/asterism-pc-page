@@ -1,0 +1,323 @@
+<section class="content-header">
+    <h1>
+        系统管理
+        <small>角色管理</small>
+    </h1>
+</section>
+<div class="content">
+    <link rel="stylesheet" href="plugins/datatables/dataTables.bootstrap.css">
+    <link rel="stylesheet" href="plugins/dialog/dialog.css">
+    <link rel="stylesheet" href="plugins/jstree/themes/default/style.min.css">
+    <div class="row">
+        <div id="grid_1_filter">
+            <form class="form-inline">
+                <div class="form-group" style="width: 25%">
+                    <label class="sr-only" for="exampleInputUserName3">userName</label>
+                    <input type="text" class="form-control" name="permissionName" id="exampleInputUserName3"
+                           placeholder="权限名称">
+                </div>
+            </form>
+        </div>
+        <div id="grid_1"></div>
+    </div>
+    <script src="plugins/pagination/jquery.pagination.js"></script>
+    <script src="plugins/dialog/dialog.js"></script>
+    <script src="plugins/grid/jquery.grid.js"></script>
+    <script src="plugins/jstree/jstree.js"></script>
+    <script type="text/javascript">
+        $('#grid_1').grid({
+            pagination: {
+                "pageSize": 10,
+                "currentPage": 1,
+                "textPrev": "上一页",
+                "textNext": "下一页",
+                "textStatus": "当前显示第 ${limit1} 至 ${limit2} 条，共 ${total} 条数据。",
+                "onPageChange": function (page) {
+                }
+            },
+            idField: 'id',
+            dataUrl: '/pc/permission/queryPermissions?pageSize=$pageSize&pageIndex=$pageIndex&name=$permissionName&sortFeild=$sortFeild&sortType=$sortType',
+            multiDeleteUrl: '/mock/grid.json?action=multiDetele&ids=$ids',
+            filter: $('#grid_1_filter'),
+            title: '权限列表',
+            tools: [
+                {
+                    icon: 'fa-remove',
+                    title: '删除',
+                    style: 'danger', // default, primary, success, info, warning, danger, link
+                    batchAction: function (ids, button, grid) {
+                        Dialog.show({
+                            title: '批量删除' + ids.split(',').length + '项',
+                            message: '是否删除？',
+                            buttons: [
+                                {
+                                    label: '取消',
+                                    action: function (dialog) {
+                                        dialog.close();
+                                    }
+                                }, {
+                                    label: '删除',
+                                    cssClass: 'btn-danger',
+                                    action: function (dialog) {
+                                        $.get('/pc/role/delete?ids=' + ids)
+                                            .success(function () {
+                                                Dialog.alert({
+                                                    message: '删除成功！',
+                                                    size: 'size-small',
+                                                    type: 'type-success'
+                                                });
+                                                grid.reload(); // 刷新表格
+                                                dialog.close();
+                                            })
+                                            .error(function () {
+                                                Dialog.alert({
+                                                    message: '删除失败！',
+                                                    size: 'size-small',
+                                                    type: 'type-warning'
+                                                });
+                                            });
+                                    }
+                                }
+                            ]
+                        });
+                        console.log(ids);
+                    }
+                },
+                {
+                    icon: 'fa-pencil',
+                    title: '更新',
+                    width: 100,
+                    style: 'default', // default, primary, success, info, warning, danger, link
+                    action: function (data, button, grid) {
+                        $.get("web/system/role/role_page_update.html").success(function (html) {
+                            html = $(html);
+                            html.find('#roleName').val(data.roleName);
+                            html.find('#roleCode').val(data.roleCode);
+                            html.find('#description').val(data.description);
+                            html.find('#id').val(data.id);
+                            Dialog.show({
+                                'title': "编辑角色信息",
+                                'message': html,
+                                submit: function (data, dialog) {
+                                    $.post('/pc/role/update', data)
+                                        .success(function () {
+                                            Dialog.alert({
+                                                message: '更新成功。',
+                                                size: 'size-small',
+                                                type: 'type-success'
+                                            });
+                                            grid.reload(); //刷新表格
+                                            dialog.close();
+                                        })
+                                        .error(function () {
+                                            Dialog.alert({
+                                                message: '提交失败。',
+                                                size: 'size-small',
+                                                type: 'type-danger'
+                                            });
+                                        });
+                                },
+                                buttons: [{
+                                    label: '保存',
+                                    cssClass: 'btn-primary',
+                                    action: function (dialog) {
+                                        dialog.submit();
+                                    }
+                                }, {
+                                    label: '取消',
+                                    action: function (dialog) {
+                                        dialog.close();
+                                    }
+                                }]
+                            });
+                        });
+                        console.log(data);
+                    }
+                },
+                {
+                    icon: 'fa-plus',
+                    title: '新增权限',
+                    style: 'primary', // default, primary, success, info, warning, danger, link
+                    apartAction: function (button, grid) {
+                        $.get('web/system/permission/permission_page_add.html')
+                            .success(function (html) {
+                                Dialog.show({
+                                    title: '新增权限',
+                                    message: $(html),
+                                    submit: function (data, dialog) {
+                                        $.post('/pc/permission/save', data)
+                                            .success(function () {
+                                                Dialog.alert({
+                                                    message: '保存成功。',
+                                                    size: 'size-small',
+                                                    type: 'type-success'
+                                                });
+                                                grid.reload(); //刷新表格
+                                                dialog.close();
+                                            })
+                                            .error(function () {
+                                                Dialog.alert({
+                                                    message: '提交失败。',
+                                                    size: 'size-small',
+                                                    type: 'type-danger'
+                                                });
+                                            });
+                                    },
+                                    buttons: [{
+                                        label: '取消',
+                                        action: function (dialog) {
+                                            dialog.close();
+                                        }
+                                    }, {
+                                        label: '保存',
+                                        cssClass: 'btn-primary',
+                                        action: function (dialog) {
+                                            dialog.submit();
+                                        }
+                                    }]
+                                });
+                            });
+                    }
+                },
+            ],
+            hover: true,
+            zebra: true,
+            checkbox: true,
+            multiSelect: false,
+            onSelected: function () {
+            },
+            queryParams: function () {
+//                    var pageParams = pageLoader.getParams();
+//                    return {
+//                        status : pageParams.status,
+//                        name : pageParams.userName,
+//                        timestamp: new Date().getTime()
+//                    }
+            },
+            columns: [
+                {
+                    id: 'moduleName',
+                    title: '权限模块名称',
+                    sortable: true,
+                    width: 100,
+                    align: 'left',
+                    formatter:function(value,data){
+                        if(value == null){
+                            return "";
+                        }else{
+                            return value;
+                        }
+                    }
+                }, {
+                    id: 'moduleCode',
+                    title: '模块编码',
+                    sortable: false,
+                    width: 100,
+                    align: 'left',
+                    formatter: function (value, data) {
+                        if(value == null){
+                            return "";
+                        }else{
+                            return value;
+                        }
+                    }
+                }, {
+                    id: 'permissionCode',
+                    title: '权限编码',
+                    sortable: true,
+                    width: 100,
+                    align: 'left',
+                    formatter:function(value, data){
+                        if(value==null){
+                            return "";
+                        }else{
+                            return value;
+                        }
+                    }
+                },
+                {
+                    id: 'permissionUrl',
+                    title: '权限地址',
+                    sortable: true,
+                    width: 200,
+                    align: 'left',
+                    formatter:function(value, data){
+                        if(value==null){
+                            return "";
+                        }else{
+                            return value;
+                        }
+                    }
+                },
+                {
+                    id: 'parentName',
+                    title: '父级目录',
+                    sortable: true,
+                    width: 200,
+                    align: 'left',
+                    formatter:function(value, data){
+                        if(value==null){
+                            return "";
+                        }else{
+                            return value;
+                        }
+                    }
+                },
+                {
+                    id: 'terminalType',
+                    title: '父级目录',
+                    sortable: true,
+                    width: 100,
+                    align: 'left',
+                    formatter:function(value, data){
+                        if(value==null){
+                            return "";
+                        }else{
+                            if(value == 0){
+                                return "pc权限";
+                            }else if(value == 1){
+                                return "手机权限";
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'permissionType',
+                    title: '权限类型',
+                    sortable: true,
+                    width: 200,
+                    align: 'left',
+                    formatter:function(value, data){
+                        if(value==null){
+                            return "";
+                        }else{
+                            if(value==0){
+                                return "目录"
+                            }else if(value==1){
+                                return "资源"
+                            }else{
+                                return "其他"
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'createTime',
+                    title: '创建时间',
+                    sortable: true,
+                    width: 150,
+                    align: 'left',
+                    formatter:function(value, data){
+                        if(value==null){
+                            return "";
+                        }else{
+                            var entryTime = moment(value).format("YYYY-MM-DD HH:mm:ss");
+                            return entryTime;
+                        }
+                    }
+                }
+            ],
+            data: {}
+        });
+    </script>
+</div>
