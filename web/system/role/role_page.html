@@ -48,11 +48,21 @@
                     title: '分配权限',
                     style: 'warning', // default, primary, success, info, warning, danger, link
                     batchAction: function(ids,button, grid) {
-                        var url = 'web/userCenter/permissionTrees.html'
-                        $.get(url)
-                            .success(function(html) {
+                        var url = 'web/system/role/role_page_tree.html'
+                        $.get(url).success(function(html) {
                                 html = $(html);
+                                if(ids!=null && ids.length>0){
+                                    var idds = ids.split(",");
+                                    if(idds.length!=1){
+                                        Dialog.alert({
+                                            message: '请选择一个角色进行分配。',
+                                            size: 'size-small',
+                                            type: 'type-danger'
+                                        });
+                                    }
+                                }
                                 html.find('#roleIds').val(ids);
+
                                 Dialog.show({
                                     title: '分配权限',
                                     message: html,
@@ -62,10 +72,10 @@
                                             var id = $(item).parent().parent().attr('id');
                                             nodes.push(id);
                                         });
-                                        var subData = { 'roleIds':ids,
+                                        var subData = { 'roleId':ids,
                                             'permissionIds':nodes.join(',')
                                         }
-                                        $.post('/userCenter/saveRolePermission', subData)
+                                        $.post('/pc/permission/saveRolePermission', subData)
                                             .success(function() {
                                                 Dialog.alert({
                                                     message: '保存成功。',
@@ -245,12 +255,6 @@
             onSelected: function () {
             },
             queryParams: function () {
-//                    var pageParams = pageLoader.getParams();
-//                    return {
-//                        status : pageParams.status,
-//                        name : pageParams.userName,
-//                        timestamp: new Date().getTime()
-//                    }
             },
             columns: [
                 {

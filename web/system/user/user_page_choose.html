@@ -1,0 +1,27 @@
+<form>
+    <label>选择角色</label>
+    <div class="checkbox" id="roleList"></div>
+    <input type="hidden" name="userId" id="userId">
+</form>
+<script type="text/javascript">
+    function init(){
+        $.get('/pc/role/queryCurrentTenantRoles').success(function(resp) {
+            console.log(resp.data);
+            $.each(resp.data, function(i, value) {
+                var text = '<label style="width:30%">' + '<input type="checkbox"  value="' + value.id + '" name="roleIds" id="check' + value.id + '">' + value.roleName + '</label>';
+                $('#roleList').append(text);
+            });
+            getCheckedRole();
+        });
+    }
+
+    function getCheckedRole(){
+        $.get('/pc/role/queryBandingRoles?userId=' + eval($('#userId').val())).success(function(resp) {
+            $.each(resp.data, function(i, value) {
+                $("#check"+value.roleId).attr('checked', 'checked');
+            })
+            console.log(resp);
+        });
+    }
+    init();
+</script>

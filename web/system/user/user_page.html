@@ -58,55 +58,55 @@
                         title: '分配角色',
                         style: 'warning', // default, primary, success, info, warning, danger, link
                         batchAction: function(ids,button, grid) {
-                            var url = 'web/userCenter/permissionTrees.html'
-                            $.get(url)
-                                    .success(function(html) {
-                                        html = $(html);
-                                        html.find('#roleIds').val(ids);
-                                        Dialog.show({
-                                            title: '分配角色',
-                                            message: html,
-                                            submit: function(data, dialog) {
-                                                var nodes = $("#permissionTree").jstree("get_checked");
-                                                $.each($('.jstree-undetermined'), function(i, item) {
-                                                    var id = $(item).parent().parent().attr('id');
-                                                    nodes.push(id);
+                            $.get("web/system/user/user_page_choose.html").success(function(html){
+                                html = $(html);
+                                html.find("#userId").val(ids);
+                                if(ids!=null && ids!=''){
+                                     var idds = ids.split(",");
+                                     if(idds.length!=1){
+                                         Dialog.alert({
+                                             message: '请选择一个用户进行分配。',
+                                             size: 'size-small',
+                                             type: 'type-danger'
+                                         });
+                                     }
+                                }
+                                Dialog.show({
+                                    title: '分配角色',
+                                    message: html,
+                                    submit: function(data, dialog) {
+                                        $.post('/pc/role/saveUserRole', data)
+                                            .success(function() {
+                                                Dialog.alert({
+                                                    message: '保存成功。',
+                                                    size: 'size-small',
+                                                    type: 'type-success'
                                                 });
-                                                var subData = { 'roleIds':ids,
-                                                                'permissionIds':nodes.join(',')
-                                                               }
-                                                $.post('/userCenter/saveRolePermission', subData)
-                                                        .success(function() {
-                                                            Dialog.alert({
-                                                                message: '保存成功。',
-                                                                size: 'size-small',
-                                                                type: 'type-success'
-                                                            });
-                                                            grid.reload(); //刷新表格
-                                                            dialog.close();
-                                                        })
-                                                        .error(function() {
-                                                            Dialog.alert({
-                                                                message: '提交失败。',
-                                                                size: 'size-small',
-                                                                type: 'type-danger'
-                                                            });
-                                                        });
-                                            },
-                                            buttons: [{
-                                                label: '取消',
-                                                action: function(dialog) {
-                                                    dialog.close();
-                                                }
-                                            }, {
-                                                label: '保存',
-                                                cssClass: 'btn-primary',
-                                                action: function(dialog) {
-                                                    dialog.submit();
-                                                }
-                                            }]
-                                        });
-                                    });
+                                                grid.reload(); //刷新表格
+                                                dialog.close();
+                                            })
+                                            .error(function() {
+                                                Dialog.alert({
+                                                    message: '提交失败。',
+                                                    size: 'size-small',
+                                                    type: 'type-danger'
+                                                });
+                                            });
+                                    },
+                                    buttons: [{
+                                        label: '取消',
+                                        action: function(dialog) {
+                                            dialog.close();
+                                        }
+                                    }, {
+                                        label: '保存',
+                                        cssClass: 'btn-primary',
+                                        action: function(dialog) {
+                                            dialog.submit();
+                                        }
+                                    }]
+                                });
+                            })
                         }
                     },
                     {

@@ -1,0 +1,56 @@
+<div class="box-body box-profile" id="permissionTree"></div>
+<form>
+    <input type="hidden" class="form-control" name="permissionIds" id="permissionIds">
+    <input type="hidden" class="form-control" name="roleId" id="roleIds">
+</form>
+<script type="text/javascript">
+    $("#permissionTree").jstree({
+        'plugins': ["themes", "json_data", "search", "checkbox"],
+        'core': {
+            'data': function(obj, callback) {
+                $.ajax({
+                    'url': '/pc/permission/queryCurrentTenantPermissions',
+                    'type': 'get',
+                    'dataType': 'json',
+                    'success': function(data) {
+                        var dataArray = new Array();
+                        var departments = data.data;
+                        $.each(departments, function(i, element) {
+                            var jsonObj = {
+                                'id': element.id,
+                                'parent': element.parentId,
+                                status: {
+                                    checked: true,
+                                    open: true
+                                },
+                                'text': element.permissionName,
+                            };
+                            dataArray.push(jsonObj);
+                        });
+                        callback.call(this, dataArray);
+                        if ($("#roleIds").val().indexOf(',') == -1) {
+                            $.get("/pc/permission/queryBandingPermissions?roleId=" + $("#roleIds").val()).success(function(data) {
+                                var permissionIds = data.data;
+                                $("#permissionIds").val(permissionIds);
+                                $("#permissionTree").find("li").each(function() {
+                                    var tempid = $(this).attr("id");
+                                    if (permissionIds.indexOf(parseInt(tempid)) != -1) {
+                                        if ($('#' + tempid).children('ul').size() == 0) {
+                                            $("#permissionTree").jstree("check_node", tempid);
+                                        }
+                                    }
+                                });
+                            });
+                        }
+
+                    }
+                });
+            },
+            "checkbox": {
+                "keep_selected_style": true
+            }
+        }
+    }).on("ready.jstree", function(e, data) {
+        data.instance.open_all();
+    });
+</script>
